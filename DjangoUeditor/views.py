@@ -188,8 +188,14 @@ def UploadFile(request):
         "extname":upload_original_ext[1:],
         "filename":upload_file_name,
     })
-    #取得输出文件的路径
-    OutputPathFormat,OutputPath,OutputFile=get_output_path(request,upload_path_format[action],path_format_var)
+
+    upload_module_name = USettings.UEditorUploadSettings.get("upload_module", None)
+    if upload_module_name:
+        mod = import_module(upload_module_name)
+        OutputPathFormat,OutputPath,OutputFile = mod.get_output_path(upload_file_name)
+    else:
+        #取得输出文件的路径
+        OutputPathFormat,OutputPath,OutputFile=get_output_path(request,upload_path_format[action],path_format_var)
 
     #所有检测完成后写入文件
     if state=="SUCCESS":
@@ -197,9 +203,7 @@ def UploadFile(request):
             state=save_scrawl_file(request, os.path.join(OutputPath,OutputFile))
         else:
             #保存到文件中，如果保存错误，需要返回ERROR
-            upload_module_name = USettings.UEditorUploadSettings.get("upload_module", None)
             if upload_module_name:
-                mod = import_module(upload_module_name)
                 state = mod.upload(file, OutputPathFormat)
             else:
                 state = save_upload_file(file, os.path.join(OutputPath, OutputFile))
@@ -302,5 +306,3 @@ def save_scrawl_file(request,filename):
     except Exception,E:
         state="写入图片文件错误:%s" % E.message
     return state
-
-
