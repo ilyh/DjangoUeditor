@@ -257,7 +257,11 @@ def catcher_remote_image(request):
                     f = open(o_filename, 'wb')
                     f.write(remote_image.read())
                     f.close()
-                    state="SUCCESS"
+                    f = open(o_filename, 'rb')
+                    upload_module_name = USettings.UEditorUploadSettings.get("upload_module", None)
+                    mod = import_module(upload_module_name)
+                    state = mod.upload(f, o_path_format)
+                    f.close()
                 except Exception,E:
                     state=u"写入抓取图片文件错误:%s" % E.message
             except Exception,E:
