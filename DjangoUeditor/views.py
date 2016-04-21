@@ -7,6 +7,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime,random
 import urllib
+import urlparse
 
 def get_path_format_vars():
     return {
@@ -239,6 +240,16 @@ def catcher_remote_image(request):
         #取得上传的文件的原始名称
         remote_file_name=os.path.basename(remote_url)
         remote_original_name,remote_original_ext=os.path.splitext(remote_file_name)
+
+        if remote_original_ext == '':
+            # 微信公众号的图片处理
+            try:
+                query = urlparse.urlparse(remote_url).query
+                remote_original_ext = '.' + urlparse.parse_qs(query)['wx_fmt'][0]
+            except Exception, e:
+                pass
+            # print remote_original_ext
+
         #文件类型检验
         if remote_original_ext  in allow_type:
             path_format_var.update({
@@ -249,6 +260,13 @@ def catcher_remote_image(request):
             #计算保存的文件名
             o_path_format,o_path,o_file=get_output_path(request,"catcherPathFormat",path_format_var)
             o_filename=os.path.join(o_path,o_file).replace("\\","/")
+            o_filename=o_filename.replace('&','_')
+            o_filename=o_filename.replace('?','_')
+            o_filename=o_filename.replace('=','_')
+            o_path_format=o_path_format.replace('?','_')
+            o_path_format=o_path_format.replace('&','_')
+            o_path_format=o_path_format.replace('=','_')
+
             #读取远程图片文件
             try:
                 remote_image=urllib.urlopen(remote_url)
