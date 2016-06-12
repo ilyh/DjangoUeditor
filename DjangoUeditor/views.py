@@ -7,6 +7,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime,random
 import urllib
+import requests
 import urlparse
 
 def get_path_format_vars():
@@ -278,7 +279,7 @@ def catcher_remote_image(request):
                     f = open(o_filename, 'rb')
                     upload_module_name = USettings.UEditorUploadSettings.get("upload_module", None)
                     mod = import_module(upload_module_name)
-                    state = mod.upload(f, o_path_format)
+                    state = mod.upload(f, "{0}/{1}".format(USettings.gSettings.OSS_EDITOR_FOLDER,o_path_format))
                     f.close()
                 except Exception,E:
                     state=u"写入抓取图片文件错误:%s" % E.message
@@ -287,7 +288,7 @@ def catcher_remote_image(request):
 
             catcher_infos.append({
                 "state":state,
-                "url":urllib.basejoin(USettings.gSettings.MEDIA_URL , o_path_format),
+                "url":urllib.basejoin(USettings.gSettings.MEDIA_URL , "{0}/{1}".format(USettings.gSettings.OSS_EDITOR_FOLDER,o_path_format)),
                 "size":os.path.getsize(o_filename),
                 "title":os.path.basename(o_file),
                 "original":remote_file_name,
