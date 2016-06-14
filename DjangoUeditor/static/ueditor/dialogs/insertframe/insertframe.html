@@ -67,6 +67,10 @@
             alert(lang.enterAddress);
             return false;
         }
+        if(url.indexOf("/iframe/preview.html") > 0){
+        url = url.replace("https://v.qq.com/iframe/preview.html", "https://v.qq.com/iframe/player.html");
+        url = url.replace(/width=[1-9]+[.]?\d*&height=[1-9]+[.]?\d*/, "width=100%25");
+        }
         newIframe.setAttribute("src",/http:\/\/|https:\/\//ig.test(url) ? url : "http://"+url);
         newIframe.setAttribute("width",width);
         /^[1-9]+[.]?\d*$/g.test( height ) ? newIframe.setAttribute("height",height) : "";
