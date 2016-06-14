@@ -9,6 +9,7 @@ import datetime,random
 import urllib
 import requests
 import urlparse
+import uuid
 
 def get_path_format_vars():
     return {
@@ -260,14 +261,9 @@ def catcher_remote_image(request):
             })
             #计算保存的文件名
             o_path_format,o_path,o_file=get_output_path(request,"catcherPathFormat",path_format_var)
-            o_filename=os.path.join(o_path,o_file).replace("\\","/")
-            o_filename=o_filename.replace('&','_')
-            o_filename=o_filename.replace('?','_')
-            o_filename=o_filename.replace('=','_')
-            o_path_format=o_path_format.replace('?','_')
-            o_path_format=o_path_format.replace('&','_')
-            o_path_format=o_path_format.replace('=','_')
-
+            o_filename = '{0}{1}'.format(uuid.uuid4(),remote_original_ext)
+            o_path_format = o_filename
+ 
             #读取远程图片文件
             try:
                 remote_image=urllib.urlopen(remote_url)
